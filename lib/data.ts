@@ -14,7 +14,12 @@ export const GRANTS = [
       { subject: 'Scale', A: 60, B: 150, fullMark: 150 },
     ],
     matchScore: 92,
-    tags: ["DeepTech", "R&D", "Non-dilutive"]
+    tags: ["DeepTech", "R&D", "Non-dilutive"],
+    faq: [
+      { question: "Can I use funds for marketing?", answer: "No. NSF funds must be strictly used for R&D and technical development. Marketing costs are unallowable." },
+      { question: "Is there a minimum team size?", answer: "No, but you must have a PI (Principal Investigator) employed >= 51% by the startup." },
+      { question: "What is the success rate?", answer: "Phase I success rates are typically around 15-20%." }
+    ]
   },
   {
     id: "yc-s24",
@@ -31,7 +36,12 @@ export const GRANTS = [
       { subject: 'Scale', A: 100, B: 150, fullMark: 150 },
     ],
     matchScore: 85,
-    tags: ["Accelerator", "SaaS", "B2B"]
+    tags: ["Accelerator", "SaaS", "B2B"],
+    faq: [
+      { question: "Do I need a co-founder?", answer: "It is highly recommended. Solo founders are funded, but it's much harder." },
+      { question: "Do you take equity?", answer: "Yes, YC takes 7% for $125k, plus an additional $375k on an MFN safe." },
+      { question: "Is it remote?", answer: "No, the batch takes place in person in San Francisco." }
+    ]
   },
   {
     id: "nih-sbir",
@@ -48,7 +58,12 @@ export const GRANTS = [
       { subject: 'Scale', A: 50, B: 150, fullMark: 150 },
     ],
     matchScore: 78,
-    tags: ["Health", "BioTech", "R&D"]
+    tags: ["Health", "BioTech", "R&D"],
+    faq: [
+      { question: "What is the review process duration?", answer: "Typically 4-6 months from submission to notice of award." },
+      { question: "Can I pivot during Phase I?", answer: "Yes, provided the core R&D goals remain aligned with the mission." },
+      { question: "Are clinical trials covered?", answer: "Phase I usually covers pre-clinical work. Clinical trials are Phase II." }
+    ]
   },
   {
     id: "doe-clean-energy",
@@ -65,7 +80,12 @@ export const GRANTS = [
       { subject: 'Scale', A: 80, B: 150, fullMark: 150 },
     ],
     matchScore: 88,
-    tags: ["Climate", "Energy", "GreenTech"]
+    tags: ["Climate", "Energy", "GreenTech"],
+    faq: [
+      { question: "Does this cover hardware?", answer: "Yes, hardware prototypes and pilot plants are eligible." },
+      { question: "Is cost-sharing required?", answer: "For some programs, yes. Usually 20% cost share for R&D." },
+      { question: "Can I partner with a university?", answer: "Yes, university partnerships are strongly encouraged." }
+    ]
   },
   {
     id: "gates-foundation",
@@ -82,7 +102,12 @@ export const GRANTS = [
       { subject: 'Scale', A: 90, B: 150, fullMark: 150 },
     ],
     matchScore: 65,
-    tags: ["Global Health", "Non-profit", "Social Impact"]
+    tags: ["Global Health", "Non-profit", "Social Impact"],
+    faq: [
+      { question: "Is my IP protected?", answer: "Yes, you retain all intellectual property rights." },
+      { question: "Do I need non-profit status?", answer: "No, both for-profit and non-profit organizations can apply." },
+      { question: "What is the reporting requirement?", answer: "Simple 2-page reports every 6 months." }
+    ]
   }
 ];
 

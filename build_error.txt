@@ -1,0 +1,30 @@
+
+> grant-match-ai@0.1.0 build
+> next build
+
+unhandledRejection Error: Cannot find module 'caniuse-lite/dist/unpacker/agents'
+Require stack:
+- E:\Neurathon project\grant-match-ai\node_modules\next\dist\compiled\browserslist\index.js
+- E:\Neurathon project\grant-match-ai\node_modules\next\dist\build\utils.js
+- E:\Neurathon project\grant-match-ai\node_modules\next\dist\build\entries.js
+- E:\Neurathon project\grant-match-ai\node_modules\next\dist\build\index.js
+- E:\Neurathon project\grant-match-ai\node_modules\next\dist\cli\next-build.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at E:\Neurathon project\grant-match-ai\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (E:\Neurathon project\grant-match-ai\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'E:\\Neurathon project\\grant-match-ai\\node_modules\\next\\dist\\compiled\\browserslist\\index.js',
+    'E:\\Neurathon project\\grant-match-ai\\node_modules\\next\\dist\\build\\utils.js',
+    'E:\\Neurathon project\\grant-match-ai\\node_modules\\next\\dist\\build\\entries.js',
+    'E:\\Neurathon project\\grant-match-ai\\node_modules\\next\\dist\\build\\index.js',
+    'E:\\Neurathon project\\grant-match-ai\\node_modules\\next\\dist\\cli\\next-build.js'
+  ]
+}
