@@ -11,50 +11,10 @@ import DraftPreviewModal from './DraftPreviewModal';
 import AiJuryModal from './AiJuryModal';
 // @ts-ignore
 import EligibilityModal from './EligibilityModal';
+import { t as getTranslations } from '@/lib/translations';
+import clsx from 'clsx';
 
-const TRANSLATIONS = {
-    en: {
-        grantAmount: "Grant Amount",
-        autoDraft: "Auto-Draft",
-        thinking: "Thinking...",
-        practiceInterview: "Practice Interview",
-        checkEligibility: "Check Eligibility",
-        portal: "Portal",
-        analysis: "Analysis",
-        checklist: "Checklist",
-        strategy: "AI-Rewritten Pitch Strategy",
-        ask: "Ask Question",
-        checklistItems: ["Pitch Deck", "3-Year Financials", "Founder Aadhaar/PAN", "DPIIT Recognition"]
-    },
-    hi: {
-        grantAmount: "अनुदान राशि",
-        autoDraft: "स्वतः मसौदा",
-        thinking: "सोच रहा हूँ...",
-        practiceInterview: "साक्षात्कार अभ्यास",
-        checkEligibility: "पात्रता की जांच करें",
-        portal: "पोर्टल",
-        analysis: "विश्लेषण",
-        checklist: "जांच सूची",
-        strategy: "AI पिच रणनीति",
-        ask: "प्रश्न पूछें",
-        checklistItems: ["पिच डेक", "3 साल का वित्तीय विवरण", "संस्थापक आधार/पैन", "DPIIT मान्यता"]
-    },
-    ta: {
-        grantAmount: "மானியத் தொகை",
-        autoDraft: "தானியங்கி வரைவு",
-        thinking: "சிந்திக்கிறது...",
-        practiceInterview: "நேர்காணல் பயிற்சி",
-        checkEligibility: "தகுதியை சரிபார்க்கவும்",
-        portal: "இணையதளம்",
-        analysis: "பகுப்பாய்வு",
-        checklist: "சரிபார்ப்புப் பட்டியல்",
-        strategy: "AI பிட்ச் உத்தி",
-        ask: "கேள்வி கேட்க",
-        checklistItems: ["பிட்ச் டெக்", "3 ஆண்டு நிதி அறிக்கைகள்", "நிறுவனர் ஆதார்/பான்", "DPIIT அங்கீகாரம்"]
-    }
-};
-
-export default function GrantCard({ grant, lang = 'en', profile }: { grant: any, lang?: string, profile?: any }) {
+export default function GrantCard({ grant, lang = 'en', profile, aiAnalysis, pitch, isDarkMode = false }: { grant: any, lang?: string, profile?: any, aiAnalysis?: { eligibility: string; score: number; reason: string; strategy: string }, pitch?: string, isDarkMode?: boolean }) {
     const [activeTab, setActiveTab] = useState<'radar' | 'docs'>('radar');
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [showChat, setShowChat] = useState(false);
@@ -66,7 +26,7 @@ export default function GrantCard({ grant, lang = 'en', profile }: { grant: any,
     const [isDrafting, setIsDrafting] = useState(false);
 
     // @ts-ignore
-    const t = TRANSLATIONS[lang] || TRANSLATIONS['en'];
+    const t = getTranslations('grantCard', lang as any);
 
     const handleSpeak = () => {
         if (isSpeaking) {
@@ -95,38 +55,83 @@ export default function GrantCard({ grant, lang = 'en', profile }: { grant: any,
 
     return (
         <>
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div className={clsx("rounded-2xl p-6 shadow-sm border hover:shadow-md transition-shadow relative overflow-hidden group",
+                isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-100"
+            )}>
+                {/* AI Eligibility Badge */}
+                {aiAnalysis && (
+                    <div className={`mb-4 px-4 py-2.5 rounded-xl border flex items-center justify-between ${aiAnalysis.eligibility === 'eligible'
+                        ? isDarkMode ? 'bg-green-900/20 border-green-800' : 'bg-green-50 border-green-200'
+                        : aiAnalysis.eligibility === 'partial'
+                            ? isDarkMode ? 'bg-yellow-900/20 border-yellow-800' : 'bg-yellow-50 border-yellow-200'
+                            : isDarkMode ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200'
+                        }`}>
+                        <div className="flex items-center gap-2">
+                            {aiAnalysis.eligibility === 'eligible' ? (
+                                <CheckCircle2 className="w-5 h-5 text-green-600" />
+                            ) : aiAnalysis.eligibility === 'partial' ? (
+                                <span className="text-yellow-600 text-lg">⚠️</span>
+                            ) : (
+                                <XCircle className="w-5 h-5 text-red-500" />
+                            )}
+                            <span className={`text-sm font-bold ${aiAnalysis.eligibility === 'eligible'
+                                ? isDarkMode ? 'text-green-400' : 'text-green-800'
+                                : aiAnalysis.eligibility === 'partial'
+                                    ? isDarkMode ? 'text-yellow-400' : 'text-yellow-800'
+                                    : isDarkMode ? 'text-red-400' : 'text-red-800'
+                                }`}>
+                                {aiAnalysis.eligibility === 'eligible'
+                                    ? '✅ Eligible'
+                                    : aiAnalysis.eligibility === 'partial'
+                                        ? '⚠️ Partially Eligible'
+                                        : '❌ Not Eligible'}
+                            </span>
+                            <span className={clsx("text-xs ml-2", isDarkMode ? "text-slate-400" : "text-slate-500")}>— {aiAnalysis.reason}</span>
+                        </div>
+                        <div className={`text-lg font-black ${aiAnalysis.score >= 70 ? 'text-green-600' : aiAnalysis.score >= 40 ? 'text-yellow-600' : 'text-red-500'
+                            }`}>
+                            {aiAnalysis.score}%
+                        </div>
+                    </div>
+                )}
+
                 <div className="flex justify-between items-start mb-6">
                     <div className="flex-1">
                         <div className="flex gap-2 mb-2">
                             {grant.tags.map((tag: string, i: number) => (
-                                <span key={i} className="text-xs font-bold px-2 py-1 bg-slate-100 text-slate-600 rounded-md uppercase tracking-wide">{tag}</span>
+                                <span key={i} className={clsx("text-xs font-bold px-2 py-1 rounded-md uppercase tracking-wide",
+                                    isDarkMode ? "bg-slate-800 text-slate-400" : "bg-slate-100 text-slate-600"
+                                )}>{tag}</span>
                             ))}
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900 mb-1">{grant.title}</h3>
-                        <p className="text-sm text-slate-500">{grant.agency}</p>
+                        <h3 className={clsx("text-xl font-bold mb-1", isDarkMode ? "text-white" : "text-slate-900")}>{grant.title}</h3>
+                        <p className={clsx("text-sm", isDarkMode ? "text-slate-400" : "text-slate-500")}>{grant.agency}</p>
                     </div>
                     <div className="text-right">
                         <div className="flex items-center justify-end gap-2 mb-1">
-                            <span className="text-2xl font-bold text-slate-900">{grant.amount}</span>
+                            <span className={clsx("text-2xl font-bold", isDarkMode ? "text-white" : "text-slate-900")}>{grant.amount}</span>
                             <button
                                 onClick={handleSpeak}
-                                className={`p-2 rounded-full transition-colors ${isSpeaking ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                                className={clsx("p-2 rounded-full transition-colors",
+                                    isSpeaking ? 'bg-red-100 text-red-600' : isDarkMode ? 'bg-slate-800 text-slate-400 hover:bg-slate-700' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                )}
                             >
                                 {isSpeaking ? <StopCircle className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                             </button>
                         </div>
-                        <span className="text-xs text-slate-400 font-medium uppercase">{t.grantAmount}</span>
+                        <span className={clsx("text-xs font-medium uppercase", isDarkMode ? "text-slate-500" : "text-slate-400")}>{t.grantAmount}</span>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-6">
                     <div className="lg:col-span-2 space-y-6">
-                        <p className="text-slate-600 leading-relaxed text-sm">{grant.description}</p>
+                        <p className={clsx("leading-relaxed text-sm", isDarkMode ? "text-slate-300" : "text-slate-600")}>{grant.description}</p>
                         <div className="flex flex-wrap gap-3">
                             <button
                                 onClick={handleAutoDraft}
-                                className="flex-1 bg-slate-900 text-white px-4 py-3 rounded-xl font-bold hover:bg-slate-800 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-900/10"
+                                className={clsx("flex-1 px-4 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg",
+                                    isDarkMode ? "bg-white text-slate-900 hover:bg-slate-200 shadow-white/5" : "bg-slate-900 text-white hover:bg-slate-800 shadow-slate-900/10"
+                                )}
                             >
                                 {isDrafting ? (
                                     <span className="animate-pulse">{t.thinking}</span>
@@ -155,24 +160,32 @@ export default function GrantCard({ grant, lang = 'en', profile }: { grant: any,
                                 href={grant.portalUrl || "#"}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="px-4 py-3 rounded-xl font-bold border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-2"
+                                className={clsx("px-4 py-3 rounded-xl font-bold border transition-colors flex items-center gap-2",
+                                    isDarkMode ? "border-slate-700 text-slate-300 hover:bg-slate-800" : "border-slate-200 text-slate-700 hover:bg-slate-50"
+                                )}
                             >
                                 {t.portal} <ExternalLink className="w-4 h-4" />
                             </a>
                         </div>
                     </div>
 
-                    <div className="lg:col-span-1 bg-slate-50 rounded-xl p-4 border border-slate-100">
-                        <div className="flex p-1 bg-slate-200 rounded-lg mb-4">
+                    <div className={clsx("lg:col-span-1 rounded-xl p-4 border",
+                        isDarkMode ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-100"
+                    )}>
+                        <div className={clsx("flex p-1 rounded-lg mb-4", isDarkMode ? "bg-slate-700" : "bg-slate-200")}>
                             <button
                                 onClick={() => setActiveTab('radar')}
-                                className={`flex-1 py-1 text-xs font-bold rounded-md transition-all ${activeTab === 'radar' ? 'bg-white shadow-sm' : ''}`}
+                                className={clsx("flex-1 py-1 text-xs font-bold rounded-md transition-all",
+                                    activeTab === 'radar' ? (isDarkMode ? 'bg-slate-600 shadow-sm text-white' : 'bg-white shadow-sm') : ''
+                                )}
                             >
                                 {t.analysis}
                             </button>
                             <button
                                 onClick={() => setActiveTab('docs')}
-                                className={`flex-1 py-1 text-xs font-bold rounded-md transition-all ${activeTab === 'docs' ? 'bg-white shadow-sm' : ''}`}
+                                className={clsx("flex-1 py-1 text-xs font-bold rounded-md transition-all",
+                                    activeTab === 'docs' ? (isDarkMode ? 'bg-slate-600 shadow-sm text-white' : 'bg-white shadow-sm') : ''
+                                )}
                             >
                                 {t.checklist}
                             </button>
@@ -184,7 +197,7 @@ export default function GrantCard({ grant, lang = 'en', profile }: { grant: any,
                             ) : (
                                 <div className="w-full space-y-3">
                                     {t.checklistItems.map((item: string, i: number) => (
-                                        <div key={i} className="flex items-center gap-2 text-sm text-slate-700">
+                                        <div key={i} className={clsx("flex items-center gap-2 text-sm", isDarkMode ? "text-slate-300" : "text-slate-700")}>
                                             {i < 3 ? <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" /> : <XCircle className="w-4 h-4 text-red-400 flex-shrink-0" />}
                                             <span className={i >= 3 ? "opacity-50" : ""}>{item}</span>
                                         </div>
@@ -195,25 +208,32 @@ export default function GrantCard({ grant, lang = 'en', profile }: { grant: any,
                     </div>
                 </div>
 
-                <div className="bg-blue-50/50 rounded-xl p-4 border border-blue-100">
+                <div className={clsx("rounded-xl p-4 border",
+                    isDarkMode ? "bg-blue-900/10 border-blue-900/30" : "bg-blue-50/50 border-blue-100"
+                )}>
                     <div className="flex justify-between items-center mb-2">
-                        <div className="flex items-center gap-2 text-xs font-bold text-blue-600 uppercase tracking-wider">
+                        <div className={clsx("flex items-center gap-2 text-xs font-bold uppercase tracking-wider", isDarkMode ? "text-blue-400" : "text-blue-600")}>
                             <Sparkles className="w-3 h-3" /> {t.strategy}
                         </div>
                         <button
                             onClick={() => setShowChat(!showChat)}
-                            className="text-xs text-slate-500 hover:text-blue-600 flex items-center gap-1"
+                            className={clsx("text-xs flex items-center gap-1",
+                                isDarkMode ? "text-slate-400 hover:text-blue-400" : "text-slate-500 hover:text-blue-600"
+                            )}
                         >
                             <MessageSquare className="w-3 h-3" /> {t.ask}
                         </button>
                     </div>
-                    <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                        To align with the {grant.agency}'s mission, we have tailored your proposal to highlight <span className="text-blue-600 bg-blue-100 px-1 rounded">indigenous innovation</span>.
+                    <p className={clsx("text-sm leading-relaxed font-medium", isDarkMode ? "text-slate-300" : "text-slate-600")}>
+                        {aiAnalysis?.strategy
+                            ? aiAnalysis.strategy
+                            : <>To align with the {grant.agency}&apos;s mission, we have tailored your proposal to highlight <span className={clsx("px-1 rounded", isDarkMode ? "text-blue-400 bg-blue-900/30" : "text-blue-600 bg-blue-100")}>indigenous innovation</span>.</>
+                        }
                     </p>
                 </div>
 
                 {showChat && (
-                    <div className="absolute inset-0 z-10 bg-white">
+                    <div className={clsx("absolute inset-0 z-10", isDarkMode ? "bg-slate-900" : "bg-white")}>
                         <GrantChat onClose={() => setShowChat(false)} grantName={grant.title} />
                     </div>
                 )}

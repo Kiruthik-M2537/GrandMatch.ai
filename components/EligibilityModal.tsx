@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/context/LanguageContext';
+import { t } from '@/lib/translations';
 
 interface EligibilityModalProps {
     isOpen: boolean;
@@ -13,6 +15,8 @@ interface EligibilityModalProps {
 export default function EligibilityModal({ isOpen, onClose, grant, userProfile }: EligibilityModalProps) {
     const [score, setScore] = useState(0);
     const [matchDetails, setMatchDetails] = useState<any[]>([]);
+    const { lang } = useLanguage();
+    const et = t('eligibility', lang);
 
     // CALCULATE SCORE BASED ON REAL SAVED PROFILE
     useEffect(() => {
@@ -22,28 +26,26 @@ export default function EligibilityModal({ isOpen, onClose, grant, userProfile }
         let details = [];
 
         // 1. Stage Check
-        // Smart Logic: Compare profile stage with grant's idealStage if available
         if (grant.idealStage) {
             if (userProfile.stage === grant.idealStage) {
                 newScore += 30;
-                details.push({ title: "Perfect Stage", desc: `Grant targets ${grant.idealStage} phase.`, type: "good" });
+                details.push({ title: et.perfectStage, desc: `Grant targets ${grant.idealStage} phase.`, type: "good" });
             } else {
                 const stages = ['Idea', 'Prototype', 'Revenue'];
                 const pIndex = stages.indexOf(userProfile.stage);
                 const gIndex = stages.indexOf(grant.idealStage);
                 if (pIndex < gIndex) {
                     newScore -= 10;
-                    details.push({ title: "Too Early", desc: `Needs ${grant.idealStage}.`, type: "bad" });
+                    details.push({ title: et.tooEarly, desc: `Needs ${grant.idealStage}.`, type: "bad" });
                 } else {
-                    newScore -= 10; // Or neutral
-                    details.push({ title: "Advanced Stage", desc: `Grant focuses on ${grant.idealStage}.`, type: "bad" });
+                    newScore -= 10;
+                    details.push({ title: et.advancedStage, desc: `Grant focuses on ${grant.idealStage}.`, type: "bad" });
                 }
             }
         } else {
-            // Fallback or generic logic if no idealStage (though smartMock has it now)
             if (userProfile.stage === 'Prototype') {
                 newScore += 10;
-                details.push({ title: "Stage OK", desc: "Prototyping is generally supported.", type: "good" });
+                details.push({ title: et.stageOk, desc: "Prototyping is generally supported.", type: "good" });
             }
         }
 
@@ -51,18 +53,18 @@ export default function EligibilityModal({ isOpen, onClose, grant, userProfile }
         if (grant.idealStatus) {
             if (userProfile.status === grant.idealStatus) {
                 newScore += 20;
-                details.push({ title: "Status Match", desc: `Grant supports ${grant.idealStatus}.`, type: "good" });
+                details.push({ title: et.statusMatch, desc: `Grant supports ${grant.idealStatus}.`, type: "good" });
             } else if (grant.idealStatus === 'Pvt Ltd' && userProfile.status !== 'Pvt Ltd') {
                 newScore -= 15;
-                details.push({ title: "Registration Needed", desc: "Must be Pvt Ltd.", type: "bad" });
+                details.push({ title: et.registrationNeeded, desc: "Must be Pvt Ltd.", type: "bad" });
             } else {
                 newScore += 10;
-                details.push({ title: "Status Accepted", desc: `Grant prefers ${grant.idealStatus}.`, type: "good" });
+                details.push({ title: et.statusAccepted, desc: `Grant prefers ${grant.idealStatus}.`, type: "good" });
             }
         } else {
             if (userProfile.status === 'Student') {
                 newScore += 10;
-                details.push({ title: "Student Category", desc: "Eligible for student tracks.", type: "good" });
+                details.push({ title: et.studentCategory, desc: "Eligible for student tracks.", type: "good" });
             }
         }
 
@@ -70,24 +72,24 @@ export default function EligibilityModal({ isOpen, onClose, grant, userProfile }
         if (grant.sector) {
             if (userProfile.domain === grant.sector) {
                 newScore += 20;
-                details.push({ title: "Sector Priority", desc: `Aligned with ${grant.sector}.`, type: "good" });
+                details.push({ title: et.sectorPriority, desc: `Aligned with ${grant.sector}.`, type: "good" });
             } else if (grant.sector === 'General') {
                 newScore += 10;
-                details.push({ title: "Sector Open", desc: "Open to all sectors.", type: "good" });
+                details.push({ title: et.sectorOpen, desc: "Open to all sectors.", type: "good" });
             } else {
                 newScore -= 10;
-                details.push({ title: "Sector Mismatch", desc: `Focus is ${grant.sector}.`, type: "bad" });
+                details.push({ title: et.sectorMismatch, desc: `Focus is ${grant.sector}.`, type: "bad" });
             }
         } else {
             if (userProfile.domain === 'DeepTech') {
                 newScore += 20;
-                details.push({ title: "DeepTech Priority", desc: "High priority sector.", type: "good" });
+                details.push({ title: et.deepTechPriority, desc: "High priority sector.", type: "good" });
             }
         }
 
         setScore(Math.min(Math.max(newScore, 0), 98));
         setMatchDetails(details);
-    }, [isOpen, userProfile, grant]);
+    }, [isOpen, userProfile, grant, et]);
 
     if (!isOpen) return null;
 
@@ -96,7 +98,7 @@ export default function EligibilityModal({ isOpen, onClose, grant, userProfile }
             <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
                 <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
                     <div className="bg-slate-50 p-4 border-b border-slate-200 flex justify-between items-center">
-                        <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2"><ShieldCheck className="w-5 h-5 text-blue-600" /> Eligibility Analysis</h3>
+                        <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2"><ShieldCheck className="w-5 h-5 text-blue-600" /> {et.title}</h3>
                         <button onClick={onClose}><X className="w-5 h-5 text-slate-400" /></button>
                     </div>
                     <div className="p-6">
@@ -109,8 +111,8 @@ export default function EligibilityModal({ isOpen, onClose, grant, userProfile }
                                 <span className={`absolute inset-0 flex items-center justify-center text-xl font-black ${score > 80 ? "text-green-600" : "text-yellow-600"}`}>{score}%</span>
                             </div>
                             <div>
-                                <h2 className="text-lg font-bold text-slate-900">Match for {userProfile?.ventureName}</h2>
-                                <p className="text-xs text-slate-500">Based on your saved profile settings.</p>
+                                <h2 className="text-lg font-bold text-slate-900">{et.matchFor} {userProfile?.ventureName}</h2>
+                                <p className="text-xs text-slate-500">{et.basedOnProfile}</p>
                             </div>
                         </div>
                         <div className="space-y-3">
