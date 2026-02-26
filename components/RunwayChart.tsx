@@ -1,6 +1,10 @@
 "use client";
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { useLanguage } from '@/context/LanguageContext';
+import { useTheme } from '@/context/ThemeContext';
+import { t } from '@/lib/translations';
+import clsx from 'clsx';
 
 const data = [
     { month: 'Feb', withoutGrant: 10, withGrant: 10 },
@@ -14,13 +18,19 @@ const data = [
 ];
 
 export default function RunwayChart() {
+    const { lang } = useLanguage();
+    const { isDarkMode } = useTheme();
+    const rt = t('runway', lang);
+
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-full flex flex-col">
+        <div className={clsx("p-6 rounded-2xl shadow-sm border h-full flex flex-col",
+            isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-100"
+        )}>
             <div className="mb-4">
-                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    💰 Burn Rate Simulator
+                <h3 className={clsx("text-lg font-bold flex items-center gap-2", isDarkMode ? "text-white" : "text-slate-800")}>
+                    💰 {rt.title}
                 </h3>
-                <p className="text-xs text-slate-500">Visualizing Grant Impact on Survival</p>
+                <p className={clsx("text-xs", isDarkMode ? "text-slate-400" : "text-slate-500")}>{rt.subtitle}</p>
             </div>
 
             <div className="flex-1 min-h-[200px]">
@@ -36,13 +46,13 @@ export default function RunwayChart() {
                                 <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
                             </linearGradient>
                         </defs>
-                        <XAxis dataKey="month" fontSize={10} tickLine={false} axisLine={false} />
+                        <XAxis dataKey="month" fontSize={10} tickLine={false} axisLine={false} stroke={isDarkMode ? '#94a3b8' : '#64748b'} />
                         <YAxis hide domain={[0, 35]} />
                         <Tooltip
-                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', backgroundColor: isDarkMode ? '#1e293b' : '#fff', color: isDarkMode ? '#e2e8f0' : '#1e293b' }}
                             formatter={(value, name) => [
                                 `₹${value} Lakhs`,
-                                name === 'withGrant' ? 'With Grant' : 'Without Grant'
+                                name === 'withGrant' ? rt.withGrant : rt.withoutGrant
                             ]}
                         />
                         <Area
@@ -68,10 +78,10 @@ export default function RunwayChart() {
 
             <div className="mt-2 flex items-center justify-between text-xs font-medium">
                 <span className="text-red-500 flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-red-500"></span> Death Valley (Jun)
+                    <span className="w-2 h-2 rounded-full bg-red-500"></span> {rt.deathValley}
                 </span>
                 <span className="text-green-600 flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-green-500"></span> +8 Months Runway
+                    <span className="w-2 h-2 rounded-full bg-green-500"></span> {rt.runway}
                 </span>
             </div>
         </div>
